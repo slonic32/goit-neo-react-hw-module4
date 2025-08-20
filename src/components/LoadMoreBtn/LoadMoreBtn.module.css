@@ -1,0 +1,11 @@
+.button {
+  background-color: blue;
+  color: white;
+  display: block;
+  margin: auto;
+  border: none;
+  outline: none;
+  border-radius: 3px;
+  height: 32px;
+  width: 120px;
+}

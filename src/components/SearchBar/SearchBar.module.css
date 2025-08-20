@@ -1,0 +1,42 @@
+.searchbar {
+  background-color: blue;
+  padding: 10px 0;
+  margin-bottom: 12px;
+}
+.form {
+  margin: auto;
+  background-color: white;
+  width: 450px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  border-radius: 3px;
+}
+.button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background-color: white;
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  height: 16px;
+  width: 16px;
+}
+
+.buttonLabel {
+  display: none;
+}
+.input {
+  border: none;
+
+  outline: none;
+  width: 400px;
+}
