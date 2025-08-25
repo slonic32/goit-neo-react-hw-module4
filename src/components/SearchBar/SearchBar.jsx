@@ -6,13 +6,13 @@ import toast, { Toaster } from "react-hot-toast";
 export default function SearchBar({ onSubmit }) {
   const initialValues = { filter: "" };
 
-  function handleSubmit(values, actions) {
+  function handleSubmit(values) {
     if (values.filter.trim() === "") {
-      toast.error("You need to enter search querry!");
+      toast.error("You need to enter search query!");
       return;
     }
-    onSubmit(values.filter, 1);
-    actions.resetForm();
+    onSubmit(values.filter);
+    //actions.resetForm();
   }
 
   return (

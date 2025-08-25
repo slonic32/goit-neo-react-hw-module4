@@ -6,48 +6,66 @@ import LoadMoreBtn from "./LoadMoreBtn/LoadMoreBtn";
 import ImageModal from "./ImageModal/ImageModal";
 import { searchImages } from "../unSplashApi";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ReactModal from "react-modal";
+
+ReactModal.setAppElement("#root");
 
 export default function App() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [filter, setFilter] = useState("");
-  const [more, setMore] = useState(false);
-  const [page, setPage] = useState(1);
+
   const [modal, setModal] = useState(false);
   const [currentImage, setCurrentImage] = useState({});
-  ReactModal.setAppElement("#root");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  async function getImages(filter, page) {
-    setPage(page);
-    setFilter(filter);
-    setMore(false);
+  useEffect(() => {
+    if (!query) return;
 
-    try {
-      setError(false);
-      setLoading(true);
-      const imageArray = await searchImages(filter, page, 12);
-      if (page === 1) {
-        //new search
-        setImages(imageArray.results);
-      } else {
-        setImages([...images, ...imageArray.results]);
-      }
+    async function fetchImages() {
+      try {
+        setError(false);
+        setLoading(true);
 
-      if (imageArray.total_pages > page) {
-        setMore(true);
+        const imageArray = await searchImages(query, page, 12);
+        if (page === 1) {
+          //new search
+          setImages(imageArray.results);
+        } else {
+          setImages(images => [...images, ...imageArray.results]);
+        }
+        setTotalPages(imageArray.total_pages);
+      } catch {
+        if (page === 1) {
+          //new search
+          setImages([]);
+        }
+        setError(true);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      if (page === 1) {
-        //new search
-        setImages([]);
-      }
-      setError(true);
-    } finally {
-      setLoading(false);
+    }
+
+    fetchImages();
+  }, [query, page]);
+
+  function handleSearch(newQuery) {
+    const q = newQuery.trim();
+    if (!q) return;
+    setQuery(q);
+    setPage(1);
+    setImages([]);
+    setTotalPages(0);
+    setError(false);
+  }
+
+  function handleLoadMore() {
+    if (!loading && page < totalPages) {
+      setPage(prev => prev + 1);
     }
   }
 
@@ -62,13 +80,11 @@ export default function App() {
 
   return (
     <>
-      <SearchBar onSubmit={getImages}></SearchBar>
+      <SearchBar onSubmit={handleSearch}></SearchBar>
       <ImageGallery imagesArray={images} handleClick={openModal} />
       {loading && <Loader />}
       {error && <ErrorMessage />}
-      {more && (
-        <LoadMoreBtn onClick={getImages} filter={filter} currentPage={page} />
-      )}
+      {page < totalPages && <LoadMoreBtn onClick={handleLoadMore} />}
       <ImageModal image={currentImage} isOpen={modal} closeModal={closeModal} />
     </>
   );
